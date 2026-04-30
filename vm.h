@@ -1,12 +1,10 @@
-#ifndef VM_H
-#define VM_H
+#ifndef vm_h
+#define vm_h
 
 #include "chunk.h"
-#include "common.h"
+#include "value.h"
 
 #define STACK_MAX 256
-#define GLOBAL_MAX 256
-#define LOCAL_MAX 256
 
 typedef struct {
     Chunk* chunk;
@@ -14,14 +12,20 @@ typedef struct {
 
     Value stack[STACK_MAX];
     Value* stackTop;
-
-    Value globals[GLOBAL_MAX];
-    Value locals[LOCAL_MAX];
 } VM;
 
-void initVM(VM* vm);
-void freeVM(VM* vm);
+typedef enum {
+    INTERPRET_OK,
+    INTERPRET_COMPILE_ERROR,
+    INTERPRET_RUNTIME_ERROR
+} InterpretResult;
 
-void interpret(VM* vm, Chunk* chunk);
+void initVM(void);
+void freeVM(void);
+
+InterpretResult interpret(Chunk* chunk);
+
+void push(Value value);
+Value pop(void);
 
 #endif
