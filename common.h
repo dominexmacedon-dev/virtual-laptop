@@ -27,6 +27,8 @@ typedef enum {
     OP_SUBTRACT,
     OP_MULTIPLY,
     OP_DIVIDE,
+    OP_MOD,
+    OP_POW,
     OP_NEGATE,
 
     OP_EQUAL,
@@ -40,8 +42,16 @@ typedef enum {
     OP_AND,
     OP_OR,
 
+    OP_BIT_AND,
+    OP_BIT_OR,
+    OP_BIT_XOR,
+    OP_BIT_NOT,
+    OP_SHIFT_LEFT,
+    OP_SHIFT_RIGHT,
+
     OP_POP,
     OP_DUP,
+    OP_SWAP,
 
     OP_OUT,
 
@@ -49,13 +59,18 @@ typedef enum {
     OP_GET_GLOBAL,
     OP_SET_GLOBAL,
 
+    OP_GET_LOCAL,
+    OP_SET_LOCAL,
+
     OP_JUMP,
     OP_JUMP_IF_FALSE,
+    OP_JUMP_IF_TRUE,
     OP_LOOP,
 
     OP_CALL,
     OP_RETURN,
 
+    OP_NOP,
     OP_END
 
 } OpCode;
