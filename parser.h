@@ -3,6 +3,7 @@
 
 #include "lexer.h"
 #include "chunk.h"
+#include "common.h"
 
 typedef struct {
     Lexer lexer;
