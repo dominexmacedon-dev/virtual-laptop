@@ -78,12 +78,22 @@ static Token number(Lexer* lexer) {
     return makeToken(lexer, TOKEN_NUMBER);
 }
 
+
+static TokenType checkKeyword(const char* start, int length, const char* word) {
+    return (strlen(word) == length && strncmp(start, word, length) == 0);
+}
+
 static Token identifier(Lexer* lexer) {
-    while (isalnum(peek(lexer)) || peek(lexer) == '_') advance(lexer);
+    while (isalnum(peek(lexer)) || peek(lexer) == '_') {
+        advance(lexer);
+    }
 
-    int len = (int)(lexer->current - lexer->start);
+    int length = (int)(lexer->current - lexer->start);
 
-    if (len == 3 && strncmp(lexer->start, "out", 3) == 0)
+    if (checkKeyword(lexer->start, length, "let"))
+        return makeToken(lexer, TOKEN_LET);
+
+    if (checkKeyword(lexer->start, length, "out"))
         return makeToken(lexer, TOKEN_OUT);
 
     return makeToken(lexer, TOKEN_IDENTIFIER);
