@@ -84,6 +84,13 @@ void interpret(VM* vm, Chunk* chunk) {
                 break;
             }
 
+            case OP_MOD: {
+                Value b = pop(vm);
+                Value a = pop(vm);
+                push(vm, intVal(a.as.i % b.as.i));
+                break;
+            }
+
             case OP_NEGATE: {
                 Value v = pop(vm);
                 push(vm, intVal(-v.as.i));
@@ -152,6 +159,47 @@ void interpret(VM* vm, Chunk* chunk) {
                 break;
             }
 
+            case OP_BIT_AND: {
+                Value b = pop(vm);
+                Value a = pop(vm);
+                push(vm, intVal(a.as.i & b.as.i));
+                break;
+            }
+
+            case OP_BIT_OR: {
+                Value b = pop(vm);
+                Value a = pop(vm);
+                push(vm, intVal(a.as.i | b.as.i));
+                break;
+            }
+
+            case OP_BIT_XOR: {
+                Value b = pop(vm);
+                Value a = pop(vm);
+                push(vm, intVal(a.as.i ^ b.as.i));
+                break;
+            }
+
+            case OP_BIT_NOT: {
+                Value v = pop(vm);
+                push(vm, intVal(~v.as.i));
+                break;
+            }
+
+            case OP_SHIFT_LEFT: {
+                Value b = pop(vm);
+                Value a = pop(vm);
+                push(vm, intVal(a.as.i << b.as.i));
+                break;
+            }
+
+            case OP_SHIFT_RIGHT: {
+                Value b = pop(vm);
+                Value a = pop(vm);
+                push(vm, intVal(a.as.i >> b.as.i));
+                break;
+            }
+
             case OP_POP: {
                 pop(vm);
                 break;
@@ -161,6 +209,14 @@ void interpret(VM* vm, Chunk* chunk) {
                 Value v = pop(vm);
                 push(vm, v);
                 push(vm, v);
+                break;
+            }
+
+            case OP_SWAP: {
+                Value b = pop(vm);
+                Value a = pop(vm);
+                push(vm, b);
+                push(vm, a);
                 break;
             }
 
@@ -190,20 +246,62 @@ void interpret(VM* vm, Chunk* chunk) {
                 break;
             }
 
+            case OP_JUMP_IF_TRUE: {
+                uint16_t offset = (vm->ip[0] << 8) | vm->ip[1];
+                vm->ip += 2;
+                Value v = pop(vm);
+                if (!isFalse(v)) vm->ip += offset;
+                break;
+            }
+
             case OP_LOOP: {
                 uint16_t offset = (vm->ip[0] << 8) | vm->ip[1];
                 vm->ip -= offset;
                 break;
             }
 
-            case OP_DEFINE_GLOBAL:
-            case OP_GET_GLOBAL:
-            case OP_SET_GLOBAL: {
-                return;
-            }
+            case OP_DEFINE_GLOBAL: {
+    uint8_t slot = *vm->ip++;
+    Value value = pop(vm);
+    vm->globals[slot] = value;
+    break;
+}
 
-            case OP_CALL: {
-                return;
+case OP_GET_GLOBAL: {
+    uint8_t slot = *vm->ip++;
+    push(vm, vm->globals[slot]);
+    break;
+}
+
+case OP_SET_GLOBAL: {
+    uint8_t slot = *vm->ip++;
+    vm->globals[slot] = vm->stackTop[-1];
+    break;
+}
+
+case OP_GET_LOCAL: {
+    uint8_t slot = *vm->ip++;
+    push(vm, vm->locals[slot]);
+    break;
+}
+
+case OP_SET_LOCAL: {
+    uint8_t slot = *vm->ip++;
+    vm->locals[slot] = vm->stackTop[-1];
+    break;
+}
+
+case OP_CALL: {
+    uint8_t argCount = *vm->ip++;
+    for (int i = 0; i < argCount; i++) {
+        pop(vm);
+    }
+    push(vm, intVal(0));
+    break;
+}
+
+            case OP_NOP: {
+                break;
             }
 
             case OP_RETURN:
