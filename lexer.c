@@ -72,7 +72,6 @@ static Token number(Lexer* lexer) {
 
     if (peek(lexer) == '.' && isdigit(peekNext(lexer))) {
         advance(lexer);
-
         while (isdigit(peek(lexer))) advance(lexer);
     }
 
@@ -112,11 +111,26 @@ Token scanToken(Lexer* lexer) {
         case '-': return makeToken(lexer, TOKEN_MINUS);
         case '*': return makeToken(lexer, TOKEN_STAR);
         case '/': return makeToken(lexer, TOKEN_SLASH);
+        case '%': return makeToken(lexer, TOKEN_PERCENT);
+        case '^': return makeToken(lexer, TOKEN_CARET);
 
-        case ';': return makeToken(lexer, TOKEN_SEMICOLON);
+        case '&':
+            if (match(lexer, '&')) return makeToken(lexer, TOKEN_AND_AND);
+            return makeToken(lexer, TOKEN_AMP);
 
-        case '(': return makeToken(lexer, TOKEN_LEFT_PAREN);
-        case ')': return makeToken(lexer, TOKEN_RIGHT_PAREN);
+        case '|':
+            if (match(lexer, '|')) return makeToken(lexer, TOKEN_OR_OR);
+            return makeToken(lexer, TOKEN_PIPE);
+
+        case '~': return makeToken(lexer, TOKEN_TILDE);
+
+        case '<':
+            if (match(lexer, '<')) return makeToken(lexer, TOKEN_SHIFT_LEFT);
+            return makeToken(lexer, match(lexer, '=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
+
+        case '>':
+            if (match(lexer, '>')) return makeToken(lexer, TOKEN_SHIFT_RIGHT);
+            return makeToken(lexer, match(lexer, '=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
 
         case '=':
             return makeToken(lexer, match(lexer, '=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
@@ -124,11 +138,10 @@ Token scanToken(Lexer* lexer) {
         case '!':
             return makeToken(lexer, match(lexer, '=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
 
-        case '<':
-            return makeToken(lexer, match(lexer, '=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
+        case ';': return makeToken(lexer, TOKEN_SEMICOLON);
 
-        case '>':
-            return makeToken(lexer, match(lexer, '=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
+        case '(': return makeToken(lexer, TOKEN_LEFT_PAREN);
+        case ')': return makeToken(lexer, TOKEN_RIGHT_PAREN);
     }
 
     return errorToken(lexer, "Unexpected character");
