@@ -64,13 +64,16 @@ static void emitConstant(Parser* parser, Value value) {
 
 static void expression(Parser* parser);
 
-static void variable(Parser* parser) {
-    int len = parser->previous.length;
-    const char* name = parser->previous.start;
-
-    int slot = identifierConstant(parser, name, len);
-
+static void variableLoad(Parser* parser, Token nameToken) {
+    int slot = identifierConstant(parser, nameToken.start, nameToken.length);
     emitByte(parser, OP_GET_GLOBAL);
+    emitByte(parser, slot);
+}
+
+static void variableAssign(Parser* parser, Token nameToken) {
+    int slot = identifierConstant(parser, nameToken.start, nameToken.length);
+    expression(parser);
+    emitByte(parser, OP_DEFINE_GLOBAL);
     emitByte(parser, slot);
 }
 
@@ -83,7 +86,7 @@ static void primary(Parser* parser) {
     }
 
     if (parser->previous.type == TOKEN_IDENTIFIER) {
-        variable(parser);
+        variableLoad(parser, parser->previous);
         return;
     }
 
@@ -228,25 +231,21 @@ static void expression(Parser* parser) {
 
 static void statement(Parser* parser) {
 
-    if (match(parser, TOKEN_IDENTIFIER)) {
+    if (match(parser, TOKEN_LET)) {
+        Token nameToken = parser->current;
+        consume(parser, TOKEN_IDENTIFIER);
 
-        Token nameToken = parser->previous;
+        int slot = identifierConstant(parser, nameToken.start, nameToken.length);
 
         if (match(parser, TOKEN_EQUAL)) {
-
-            int slot = identifierConstant(parser, nameToken.start, nameToken.length);
-
             expression(parser);
-
-            emitByte(parser, OP_DEFINE_GLOBAL);
-            emitByte(parser, slot);
-
-            consume(parser, TOKEN_SEMICOLON);
-            return;
+        } else {
+            emitConstant(parser, intVal(0));
         }
 
-        variable(parser);
-        emitByte(parser, OP_POP);
+        emitByte(parser, OP_DEFINE_GLOBAL);
+        emitByte(parser, slot);
+
         consume(parser, TOKEN_SEMICOLON);
         return;
     }
@@ -254,6 +253,27 @@ static void statement(Parser* parser) {
     if (match(parser, TOKEN_OUT)) {
         expression(parser);
         emitByte(parser, OP_OUT);
+        consume(parser, TOKEN_SEMICOLON);
+        return;
+    }
+
+    if (parser->current.type == TOKEN_IDENTIFIER &&
+        parser->lexer.current != parser->lexer.start) {
+
+        Token nameToken = parser->current;
+        advance(parser);
+
+        if (match(parser, TOKEN_EQUAL)) {
+            int slot = identifierConstant(parser, nameToken.start, nameToken.length);
+            expression(parser);
+            emitByte(parser, OP_DEFINE_GLOBAL);
+            emitByte(parser, slot);
+            consume(parser, TOKEN_SEMICOLON);
+            return;
+        }
+
+        variableLoad(parser, nameToken);
+        emitByte(parser, OP_POP);
         consume(parser, TOKEN_SEMICOLON);
         return;
     }
