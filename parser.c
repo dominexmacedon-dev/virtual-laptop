@@ -1,5 +1,33 @@
 #include "parser.h"
 #include <stdlib.h>
+#include <string.h>
+
+#define MAX_GLOBALS 256
+
+typedef struct {
+    const char* name;
+    int length;
+    int slot;
+} Global;
+
+static Global globals[MAX_GLOBALS];
+static int globalCount = 0;
+
+static int identifierConstant(Parser* parser, const char* name, int length) {
+    for (int i = 0; i < globalCount; i++) {
+        if (globals[i].length == length &&
+            strncmp(globals[i].name, name, length) == 0) {
+            return globals[i].slot;
+        }
+    }
+
+    int slot = globalCount++;
+    globals[slot].name = name;
+    globals[slot].length = length;
+    globals[slot].slot = slot;
+
+    return slot;
+}
 
 static void advance(Parser* parser) {
     parser->previous = parser->current;
@@ -36,11 +64,26 @@ static void emitConstant(Parser* parser, Value value) {
 
 static void expression(Parser* parser);
 
+static void variable(Parser* parser) {
+    int len = parser->previous.length;
+    const char* name = parser->previous.start;
+
+    int slot = identifierConstant(parser, name, len);
+
+    emitByte(parser, OP_GET_GLOBAL);
+    emitByte(parser, slot);
+}
+
 static void primary(Parser* parser) {
     advance(parser);
 
     if (parser->previous.type == TOKEN_NUMBER) {
         emitConstant(parser, intVal(atoi(parser->previous.start)));
+        return;
+    }
+
+    if (parser->previous.type == TOKEN_IDENTIFIER) {
+        variable(parser);
         return;
     }
 
@@ -147,70 +190,77 @@ static void equality(Parser* parser) {
     }
 }
 
-static void bitwiseAnd(Parser* parser) {
+static void bitwise(Parser* parser) {
     equality(parser);
 
-    while (check(parser, TOKEN_AMP)) {
+    while (check(parser, TOKEN_AMP) ||
+           check(parser, TOKEN_PIPE) ||
+           check(parser, TOKEN_CARET)) {
+
+        TokenType op = parser->current.type;
         advance(parser);
         equality(parser);
-        emitByte(parser, OP_BIT_AND);
+
+        if (op == TOKEN_AMP) emitByte(parser, OP_BIT_AND);
+        if (op == TOKEN_PIPE) emitByte(parser, OP_BIT_OR);
+        if (op == TOKEN_CARET) emitByte(parser, OP_BIT_XOR);
     }
 }
 
-static void bitwiseXor(Parser* parser) {
-    bitwiseAnd(parser);
+static void logic(Parser* parser) {
+    bitwise(parser);
 
-    while (check(parser, TOKEN_CARET)) {
+    while (check(parser, TOKEN_AND_AND) ||
+           check(parser, TOKEN_OR_OR)) {
+
+        TokenType op = parser->current.type;
         advance(parser);
-        bitwiseAnd(parser);
-        emitByte(parser, OP_BIT_XOR);
-    }
-}
+        bitwise(parser);
 
-static void bitwiseOr(Parser* parser) {
-    bitwiseXor(parser);
-
-    while (check(parser, TOKEN_PIPE)) {
-        advance(parser);
-        bitwiseXor(parser);
-        emitByte(parser, OP_BIT_OR);
-    }
-}
-
-static void logicAnd(Parser* parser) {
-    bitwiseOr(parser);
-
-    while (check(parser, TOKEN_AND_AND)) {
-        advance(parser);
-        bitwiseOr(parser);
-        emitByte(parser, OP_AND);
-    }
-}
-
-static void logicOr(Parser* parser) {
-    logicAnd(parser);
-
-    while (check(parser, TOKEN_OR_OR)) {
-        advance(parser);
-        logicAnd(parser);
-        emitByte(parser, OP_OR);
+        if (op == TOKEN_AND_AND) emitByte(parser, OP_AND);
+        if (op == TOKEN_OR_OR) emitByte(parser, OP_OR);
     }
 }
 
 static void expression(Parser* parser) {
-    logicOr(parser);
+    logic(parser);
 }
 
 static void statement(Parser* parser) {
+
+    if (match(parser, TOKEN_IDENTIFIER)) {
+
+        Token nameToken = parser->previous;
+
+        if (match(parser, TOKEN_EQUAL)) {
+
+            int slot = identifierConstant(parser, nameToken.start, nameToken.length);
+
+            expression(parser);
+
+            emitByte(parser, OP_DEFINE_GLOBAL);
+            emitByte(parser, slot);
+
+            consume(parser, TOKEN_SEMICOLON);
+            return;
+        }
+
+        variable(parser);
+        emitByte(parser, OP_POP);
+        consume(parser, TOKEN_SEMICOLON);
+        return;
+    }
+
     if (match(parser, TOKEN_OUT)) {
         expression(parser);
         emitByte(parser, OP_OUT);
         consume(parser, TOKEN_SEMICOLON);
-    } else {
-        expression(parser);
-        consume(parser, TOKEN_SEMICOLON);
-        emitByte(parser, OP_POP);
+        return;
     }
+
+    expression(parser);
+    consume(parser, TOKEN_SEMICOLON);
+    emitByte(parser, OP_POP);
 }
 
 static void program(Parser* parser) {
