@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Premium Programming Animation</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    width:100%;
+    height:100vh;
+    overflow:hidden;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:
+    radial-gradient(circle at top,#312e81,#020617 60%);
+
+    font-family:'Poppins',sans-serif;
+}
+
+/* FRAME */
+
+.video-frame{
+    position:relative;
+
+    width:430px;
+    height:760px;
+
+    overflow:hidden;
+    border-radius:42px;
+
+    background:
+    linear-gradient(180deg,#020617,#0f172a,#020617);
+
+    border:2px solid rgba(255,255,255,.08);
+
+    box-shadow:
+    0 0 40px rgba(0,255,255,.12),
+    0 0 120px rgba(168,85,247,.2),
+    inset 0 0 40px rgba(255,255,255,.03);
+}
+
+/* GRID */
+
+.grid{
+    position:absolute;
+    inset:0;
+
+    background-image:
+    linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+
+    background-size:40px 40px;
+
+    animation:gridMove 18s linear infinite;
+}
+
+@keyframes gridMove{
+    from{
+        transform:translateY(0);
+    }
+
+    to{
+        transform:translateY(40px);
+    }
+}
+
+/* GLOW */
+
+.glow1{
+    position:absolute;
+
+    width:380px;
+    height:380px;
+
+    border-radius:50%;
+
+    background:
+    radial-gradient(circle, rgba(0,255,255,.15), transparent 70%);
+
+    top:-120px;
+    left:-120px;
+
+    filter:blur(25px);
+
+    animation:float1 8s ease-in-out infinite;
+}
+
+.glow2{
+    position:absolute;
+
+    width:340px;
+    height:340px;
+
+    border-radius:50%;
+
+    background:
+    radial-gradient(circle, rgba(168,85,247,.18), transparent 70%);
+
+    bottom:-100px;
+    right:-100px;
+
+    filter:blur(25px);
+
+    animation:float2 10s ease-in-out infinite;
+}
+
+@keyframes float1{
+
+    0%,100%{
+        transform:translate(0,0);
+    }
+
+    50%{
+        transform:translate(50px,40px);
+    }
+}
+
+@keyframes float2{
+
+    0%,100%{
+        transform:translate(0,0);
+    }
+
+    50%{
+        transform:translate(-40px,-30px);
+    }
+}
+
+/* CONTENT */
+
+.content{
+    position:absolute;
+    inset:0;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    text-align:center;
+    color:white;
+
+    padding:35px;
+}
+
+/* SCENES */
+
+.scene{
+    position:absolute;
+
+    opacity:0;
+
+    transform:
+    translateY(30px)
+    scale(.94);
+}
+
+/* TITLES */
+
+.title{
+    font-size:50px;
+    font-weight:800;
+
+    line-height:1.1;
+    letter-spacing:-2px;
+
+    text-shadow:
+    0 0 15px rgba(255,255,255,.2),
+    0 0 40px rgba(0,255,255,.25);
+}
+
+.subtitle{
+    font-size:34px;
+    font-weight:700;
+
+    color:#d8b4fe;
+
+    text-shadow:
+    0 0 10px #a855f7,
+    0 0 40px #9333ea;
+}
+
+/* EDITOR */
+
+.editor{
+    width:360px;
+
+    padding:24px;
+
+    border-radius:28px;
+
+    background:
+    rgba(15,23,42,.78);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    backdrop-filter:blur(10px);
+
+    box-shadow:
+    0 0 40px rgba(0,255,255,.08),
+    inset 0 0 20px rgba(255,255,255,.03);
+
+    position:relative;
+}
+
+.editor::before{
+    content:'';
+
+    position:absolute;
+    inset:0;
+
+    border-radius:28px;
+
+    background:
+    linear-gradient(
+        135deg,
+        rgba(0,255,255,.06),
+        rgba(168,85,247,.04)
+    );
+
+    pointer-events:none;
+}
+
+.editor-top{
+    display:flex;
+    gap:8px;
+
+    margin-bottom:24px;
+}
+
+.dot{
+    width:12px;
+    height:12px;
+
+    border-radius:50%;
+}
+
+.red{
+    background:#ff5f57;
+}
+
+.yellow{
+    background:#febb2e;
+}
+
+.green{
+    background:#28c840;
+}
+
+/* CODE AREA */
+
+.code-line{
+    display:flex;
+    align-items:center;
+
+    gap:12px;
+
+    margin-bottom:14px;
+
+    font-family:'Fira Code', monospace;
+
+    font-size:22px;
+}
+
+.line-number{
+    color:#64748b;
+    width:20px;
+}
+
+.code-content{
+    display:flex;
+    align-items:center;
+
+    color:#7df9ff;
+
+    overflow:hidden;
+}
+
+/* TYPING */
+
+.typing-text{
+    overflow:hidden;
+
+    white-space:nowrap;
+
+    width:0;
+
+    border-right:3px solid #00ffff;
+
+    text-shadow:
+    0 0 10px #00ffff,
+    0 0 30px #00ffff;
+
+    animation:
+    typing 2.4s steps(40,end) forwards,
+    blink .8s infinite;
+}
+
+.typing-delay-2{
+    animation-delay:.5s;
+}
+
+.typing-delay-3{
+    animation-delay:1s;
+}
+
+@keyframes typing{
+
+    from{
+        width:0;
+    }
+
+    to{
+        width:100%;
+    }
+}
+
+@keyframes blink{
+
+    50%{
+        border-color:transparent;
+    }
+}
+
+/* RUN SCENE */
+
+.run-scene{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+
+    gap:38px;
+}
+
+.run-text{
+    font-size:20px;
+
+    letter-spacing:3px;
+
+    color:#94a3b8;
+}
+
+/* BUTTON */
+
+.run-btn{
+    position:relative;
+
+    width:210px;
+    height:74px;
+
+    border-radius:24px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:14px;
+
+    font-size:24px;
+    font-weight:700;
+
+    background:
+    linear-gradient(135deg,#06b6d4,#8b5cf6);
+
+    color:white;
+
+    box-shadow:
+    0 0 20px rgba(0,255,255,.45),
+    0 0 60px rgba(168,85,247,.45);
+
+    animation:pulse 2s infinite;
+}
+
+.run-btn i{
+    font-size:26px;
+
+    filter:
+    drop-shadow(0 0 10px rgba(255,255,255,.8));
+}
+
+@keyframes pulse{
+
+    0%,100%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.08);
+    }
+}
+
+/* MOUSE */
+
+.mouse{
+    position:absolute;
+
+    width:38px;
+    height:38px;
+
+    border-radius:50%;
+
+    background:white;
+
+    top:-100px;
+    left:-90px;
+
+    box-shadow:
+    0 0 15px white,
+    0 0 35px #00ffff;
+
+    animation:mouseMove 2.4s ease forwards;
+}
+
+.mouse::after{
+    content:'';
+
+    position:absolute;
+    inset:8px;
+
+    border-radius:50%;
+
+    background:#0f172a;
+}
+
+@keyframes mouseMove{
+
+    0%{
+        top:-100px;
+        left:-90px;
+        opacity:0;
+    }
+
+    10%{
+        opacity:1;
+    }
+
+    70%{
+        top:18px;
+        left:86px;
+    }
+
+    84%{
+        transform:scale(.65);
+    }
+
+    100%{
+        top:18px;
+        left:86px;
+
+        transform:scale(1);
+    }
+}
+
+/* RESULT */
+
+.result{
+    margin-top:10px;
+
+    font-size:62px;
+    font-weight:800;
+
+    opacity:0;
+
+    animation:
+    resultPop 1s forwards;
+
+    animation-delay:2.5s;
+
+    text-shadow:
+    0 0 15px #ffffff,
+    0 0 35px #00ffff,
+    0 0 80px #00ffff,
+    0 0 140px #a855f7;
+}
+
+.stringColor{
+    color:#f9a8d4;
+}
+
+.numberColor{
+    color:#7dd3fc;
+}
+
+.arrayColor{
+    color:#86efac;
+}
+
+@keyframes resultPop{
+
+    0%{
+        opacity:0;
+
+        transform:
+        scale(.4)
+        rotate(-8deg);
+
+        filter:blur(10px);
+    }
+
+    60%{
+        transform:
+        scale(1.15)
+        rotate(4deg);
+    }
+
+    100%{
+        opacity:1;
+
+        transform:
+        scale(1)
+        rotate(0deg);
+
+        filter:blur(0);
+    }
+}
+
+/* FOOTER */
+
+.footer{
+    position:absolute;
+
+    bottom:45px;
+    width:100%;
+
+    text-align:center;
+
+    color:rgba(255,255,255,.55);
+
+    font-size:15px;
+    letter-spacing:1px;
+}
+
+/* FADE */
+
+.fadeIn{
+    animation:fadeIn 1.8s forwards;
+}
+
+.fadeOut{
+    animation:fadeOut 1.5s forwards;
+}
+
+@keyframes fadeIn{
+
+    from{
+        opacity:0;
+
+        transform:
+        translateY(30px)
+        scale(.94);
+
+        filter:blur(10px);
+    }
+
+    to{
+        opacity:1;
+
+        transform:
+        translateY(0)
+        scale(1);
+
+        filter:blur(0);
+    }
+}
+
+@keyframes fadeOut{
+
+    from{
+        opacity:1;
+
+        transform:
+        translateY(0)
+        scale(1);
+
+        filter:blur(0);
+    }
+
+    to{
+        opacity:0;
+
+        transform:
+        translateY(-20px)
+        scale(.96);
+
+        filter:blur(12px);
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="video-frame">
+
+    <div class="grid"></div>
+
+    <div class="glow1"></div>
+    <div class="glow2"></div>
+
+    <div class="content">
+
+        <!-- INTRO -->
+
+        <div id="scene1" class="scene">
+
+            <div class="title">
+                What is<br>
+                Programming?
+            </div>
+
+        </div>
+
+        <!-- JS -->
+
+        <div id="scene2" class="scene">
+
+            <div class="subtitle">
+                This is Javascript.
+            </div>
+
+        </div>
+
+        <!-- STRING CODE -->
+
+        <div id="scene3" class="scene">
+
+            <div class="editor">
+
+                <div class="editor-top">
+                    <div class="dot red"></div>
+                    <div class="dot yellow"></div>
+                    <div class="dot green"></div>
+                </div>
+
+                <div class="code-line">
+                    <div class="line-number">1</div>
+
+                    <div class="code-content">
+                        <div class="typing-text">
+                            let name = "DOMINEX";
+                        </div>
+                    </div>
+                </div>
+
+                <div class="code-line">
+                    <div class="line-number">2</div>
+
+                    <div class="code-content">
+                        <div class="typing-text typing-delay-2">
+                            console.log(name);
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- STRING RUN -->
+
+        <div id="scene4" class="scene">
+
+            <div class="run-scene">
+
+                <div class="run-text">
+                    EXECUTE CODE
+                </div>
+
+                <div class="run-btn">
+
+                    <div class="mouse"></div>
+
+                    <i class="fa-solid fa-play"></i>
+                    RUN
+
+                </div>
+
+                <div class="result stringColor">
+                    DOMINEX
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- NUMBER CODE -->
+
+        <div id="scene5" class="scene">
+
+            <div class="editor">
+
+                <div class="editor-top">
+                    <div class="dot red"></div>
+                    <div class="dot yellow"></div>
+                    <div class="dot green"></div>
+                </div>
+
+                <div class="code-line">
+                    <div class="line-number">1</div>
+
+                    <div class="code-content">
+                        <div class="typing-text">
+                            let total = 10 + 20;
+                        </div>
+                    </div>
+                </div>
+
+                <div class="code-line">
+                    <div class="line-number">2</div>
+
+                    <div class="code-content">
+                        <div class="typing-text typing-delay-2">
+                            console.log(total);
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- NUMBER RUN -->
+
+        <div id="scene6" class="scene">
+
+            <div class="run-scene">
+
+                <div class="run-text">
+                    EXECUTE CODE
+                </div>
+
+                <div class="run-btn">
+
+                    <div class="mouse"></div>
+
+                    <i class="fa-solid fa-play"></i>
+                    RUN
+
+                </div>
+
+                <div class="result numberColor">
+                    30
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ARRAY CODE -->
+
+        <div id="scene7" class="scene">
+
+            <div class="editor">
+
+                <div class="editor-top">
+                    <div class="dot red"></div>
+                    <div class="dot yellow"></div>
+                    <div class="dot green"></div>
+                </div>
+
+                <div class="code-line">
+                    <div class="line-number">1</div>
+
+                    <div class="code-content">
+                        <div class="typing-text">
+                            let items = ["JS","HTML"];
+                        </div>
+                    </div>
+                </div>
+
+                <div class="code-line">
+                    <div class="line-number">2</div>
+
+                    <div class="code-content">
+                        <div class="typing-text typing-delay-2">
+                            console.log(items);
+                        </div>
+                    </div>
+                </div>
+
+                <div class="code-line">
+                    <div class="line-number">3</div>
+
+                    <div class="code-content">
+                        <div class="typing-text typing-delay-3">
+                            items.push("CSS");
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ARRAY RUN -->
+
+        <div id="scene8" class="scene">
+
+            <div class="run-scene">
+
+                <div class="run-text">
+                    EXECUTE CODE
+                </div>
+
+                <div class="run-btn">
+
+                    <div class="mouse"></div>
+
+                    <i class="fa-solid fa-play"></i>
+                    RUN
+
+                </div>
+
+                <div class="result arrayColor">
+                    ["JS","HTML","CSS"]
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- END -->
+
+        <div id="scene9" class="scene">
+
+            <div class="title">
+                This is<br>
+                Programming....
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="footer">
+        Animated by Dominex Macedon
+    </div>
+
+</div>
+
+<script>
+
+const scenes = [
+
+    { id:"scene1", show:0, hide:3500 },
+
+    { id:"scene2", show:4200, hide:7000 },
+
+    { id:"scene3", show:7600, hide:13200 },
+
+    { id:"scene4", show:13600, hide:18800 },
+
+    { id:"scene5", show:19400, hide:25000 },
+
+    { id:"scene6", show:25400, hide:30600 },
+
+    { id:"scene7", show:31200, hide:38000 },
+
+    { id:"scene8", show:38400, hide:43800 },
+
+    { id:"scene9", show:44400, hide:999999 }
+
+];
+
+scenes.forEach(scene => {
+
+    const el = document.getElementById(scene.id);
+
+    setTimeout(() => {
+
+        el.classList.add("fadeIn");
+
+    }, scene.show);
+
+    setTimeout(() => {
+
+        el.classList.remove("fadeIn");
+
+        el.classList.add("fadeOut");
+
+    }, scene.hide);
+
+});
+
+</script>
+
+</body>
+</html>
